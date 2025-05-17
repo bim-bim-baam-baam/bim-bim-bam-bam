@@ -1,0 +1,33 @@
+name: Update Submodules Every 10 Minutes
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'  # Каждые 10 минут
+  workflow_dispatch:        # Возможность ручного запуска
+
+jobs:
+  update-submodules:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.BIMBIMBAMBAM_TOKEN }}
+
+      - name: Pull latest changes in submodules
+        run: |
+          git submodule foreach '
+            echo Updating $name ...
+            git checkout main || git checkout master
+            git pull origin $(git symbolic-ref --short HEAD)
+          '
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Update submodules" || echo "No changes to commit"
+          git push

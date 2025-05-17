@@ -1,0 +1,15 @@
+[submodule "opto-llm-parser"]
+	path = opto-llm-parser
+	url = https://github.com/bim-bim-baam-baam/opto-llm-parser.git
+[submodule "main-service"]
+	path = main-service
+	url = https://github.com/bim-bim-baam-baam/main-service.git
+[submodule "cluster_service"]
+	path = cluster_service
+	url = https://github.com/bim-bim-baam-baam/cluster_service.git
+[submodule "error-parser"]
+	path = error-parser
+	url = https://github.com/bim-bim-baam-baam/error-parser.git
+[submodule "logwatcher_front"]
+	path = logwatcher_front
+	url = https://github.com/bim-bim-baam-baam/logwatcher_front.git

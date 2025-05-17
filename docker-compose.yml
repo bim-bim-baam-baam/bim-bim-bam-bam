@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  opto-llm-parser:
+    build:
+      context: ./opto-llm-parser
+    networks:
+      - internal-network
+    restart: unless-stopped
+
+  main-service:
+    build:
+      context: ./main-service
+    networks:
+      - internal-network
+    depends_on:
+      - opto-llm-parser
+    restart: unless-stopped
+
+  cluster-service:
+    build:
+      context: ./cluster_service
+    networks:
+      - internal-network
+    depends_on:
+      - main-service
+    restart: unless-stopped
+
+  error-parser:
+    build:
+      context: ./error-parser
+    networks:
+      - internal-network
+    depends_on:
+      - main-service
+    restart: unless-stopped
+
+  logwatcher-front:
+    build:
+      context: ./logwatcher_front
+    ports:
+      - "3000:3000"
+    networks:
+      - internal-network
+    depends_on:
+      - main-service
+    restart: unless-stopped
+
+networks:
+  internal-network:
+    driver: bridge 
