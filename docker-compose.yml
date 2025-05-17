@@ -1,51 +1,66 @@
-version: '3.8'
+version: "3.9"
 
 services:
+  error-parser:
+    build:
+      context: ./error-parser
+      dockerfile: Dockerfile
+    container_name: error-parser
+    ports:
+      - "8001:8001"
+    networks:
+      - backend
+    depends_on:
+      - db
+    restart: always
+
   opto-llm-parser:
     build:
       context: ./opto-llm-parser
+      dockerfile: Dockerfile
+    container_name: opto-llm-parser
+    ports:
+      - "8000:8000"
     networks:
-      - internal-network
-    restart: unless-stopped
+      - backend
+    depends_on:
+      - db
+    restart: always
 
   main-service:
     build:
       context: ./main-service
-    networks:
-      - internal-network
-    depends_on:
-      - opto-llm-parser
-    restart: unless-stopped
-
-  cluster-service:
-    build:
-      context: ./cluster_service
-    networks:
-      - internal-network
-    depends_on:
-      - main-service
-    restart: unless-stopped
-
-  error-parser:
-    build:
-      context: ./error-parser
-    networks:
-      - internal-network
-    depends_on:
-      - main-service
-    restart: unless-stopped
-
-  logwatcher-front:
-    build:
-      context: ./logwatcher_front
+      dockerfile: Dockerfile
+    container_name: main-service
     ports:
-      - "3000:3000"
+      - "8080:8080"
     networks:
-      - internal-network
+      - backend
     depends_on:
-      - main-service
-    restart: unless-stopped
+      - db
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+
+  db:
+    image: postgres:15
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    networks:
+      - backend
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
 networks:
-  internal-network:
-    driver: bridge 
+  backend:
+    driver: bridge
+
+volumes:
+  postgres_data:
