@@ -27,6 +27,20 @@ services:
       - db
     restart: always
 
+  cluster-service:
+    build:
+      context: ./cluster_service
+      dockerfile: Dockerfile
+    container_name: cluster-service
+    ports:
+      - "8002:8002"
+    networks:
+      - backend
+    depends_on:
+      - db
+      - main-service
+    restart: always
+
   main-service:
     build:
       context: ./main-service
