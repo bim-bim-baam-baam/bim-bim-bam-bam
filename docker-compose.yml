@@ -29,7 +29,7 @@ services:
 
   cluster-service:
     build:
-      context: ./cluster_service
+      context: ./cluster-service
       dockerfile: Dockerfile
     container_name: cluster-service
     ports:
